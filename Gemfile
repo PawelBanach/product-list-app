@@ -46,6 +46,7 @@ end
 group :test do
   gem 'json_spec', '~> 1.1'
   gem 'rspec-rails', '~> 3.5'
+  gem 'shoulda-matchers', '~> 4.0'
 end
 
 
