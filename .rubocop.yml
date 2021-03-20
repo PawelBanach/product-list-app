@@ -8,6 +8,15 @@ AllCops:
   Exclude:
     - bin/*
     - db/**/*
+    - config/environments/*
 Metrics/BlockLength:
   Exclude:
     - spec/**/*
+Style/StringLiterals:
+  Exclude:
+    - config/**/*
+Style/RedundantFetchBlock:
+  Exclude:
+    - config/**/*
+Style/Documentation:
+  Enabled: false
