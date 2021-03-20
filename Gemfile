@@ -42,6 +42,7 @@ group :development do
 end
 
 group :test do
+  gem 'json_spec', '~> 1.1'
   gem 'rspec-rails', '~> 3.5'
 end
 
