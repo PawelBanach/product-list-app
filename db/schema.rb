@@ -10,15 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_20_142602) do
+ActiveRecord::Schema.define(version: 2021_03_20_233737) do
+
+  create_table "product_tags", force: :cascade do |t|
+    t.integer "product_id"
+    t.integer "tag_id"
+    t.index ["product_id"], name: "index_product_tags_on_product_id"
+    t.index ["tag_id"], name: "index_product_tags_on_tag_id"
+  end
 
   create_table "products", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.decimal "price", precision: 8, scale: 2
+    t.string "name", null: false
+    t.text "description", null: false
+    t.decimal "price", precision: 8, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_products_on_name"
+    t.index ["name"], name: "index_products_on_name", unique: true
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "title", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["title"], name: "index_tags_on_title", unique: true
   end
 
 end

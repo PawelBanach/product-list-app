@@ -1,6 +1,7 @@
 require:
   - rubocop-performance
   - rubocop-rails
+  - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 2.4.10
@@ -19,4 +20,6 @@ Style/RedundantFetchBlock:
   Exclude:
     - config/**/*
 Style/Documentation:
+  Enabled: false
+Style/ClassAndModuleChildren:
   Enabled: false

@@ -12,8 +12,7 @@ module Api
       end
 
       def create
-        @product = Product.new(product_params)
-
+        @product = Product::Creator.call(product_params)
         if @product.save
           render json: @product, status: :created
         else
@@ -22,7 +21,8 @@ module Api
       end
 
       def update
-        if @product.update(product_params)
+        @product = Product::Updater.call(@product, product_params)
+        if @product.save
           render json: @product
         else
           render json: @product, status: :unprocessable_entity, serializer: ActiveModel::Serializer::ErrorSerializer
@@ -30,7 +30,11 @@ module Api
       end
 
       def destroy
-        @product.destroy
+        if @product.destroy
+          head :ok
+        else
+          render json: @product, status: :unprocessable_entity, serializer: ActiveModel::Serializer::ErrorSerializer
+        end
       end
 
       private
@@ -40,7 +44,7 @@ module Api
       end
 
       def product_params
-        params.require(:data).require(:attributes).permit(:name, :description, :price)
+        @product_params ||= Product::Params.new(params)
       end
     end
   end

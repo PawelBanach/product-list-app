@@ -13,7 +13,7 @@ describe 'Products', type: :request do
     it 'returns a success response', :aggregate_failures do
       get api_v1_products_path
 
-      expect(response).to have_http_status(200)
+      expect(response).to have_http_status(:ok)
       expect(parse_json(response.body)['data'].size).to eq(number_of_products)
     end
 
@@ -49,11 +49,8 @@ describe 'Products', type: :request do
 
     context 'with valid params' do
       it 'creates a new Product', :aggregate_failures do
-        expect do
-          post api_v1_products_path, params: params
-        end.to change(Product, :count).by(1)
-
-        expect(response).to have_http_status(201)
+        expect { post api_v1_products_path, params: params }.to change(Product, :count).by(1)
+        expect(response).to have_http_status(:created)
 
         new_product = parse_json(response.body)['data']['attributes'].symbolize_keys
         expect(new_product).to include(create_params)
@@ -70,14 +67,57 @@ describe 'Products', type: :request do
       end
 
       it 'returns error', :aggregate_failures do
-        expect do
-          post api_v1_products_path, params: params
-        end.to_not change(Product, :count)
-
-        expect(response).to have_http_status(422)
+        expect { post api_v1_products_path, params: params }.not_to change(Product, :count)
+        expect(response).to have_http_status(:unprocessable_entity)
 
         error = parse_json(response.body)['errors'].first.symbolize_keys
         expect(error[:detail]).to eq('is not a number')
+      end
+    end
+
+    context 'with existing tags' do
+      let(:tags) { ['Beverage', 'Calorie Free'] }
+      let(:create_params) do
+        {
+          name: 'Coke',
+          description: '24oz Bottle',
+          price: '1.98',
+          tags: tags
+        }
+      end
+
+      before do
+        tags.each do |title|
+          create(:tag, title: title)
+        end
+      end
+
+      it 'creates a new Product', :aggregate_failures do
+        expect { post api_v1_products_path, params: params }.not_to change(Tag, :count)
+        expect(response).to have_http_status(:created)
+
+        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        expect(product_tags.size).to eq(tags.size)
+      end
+    end
+
+    context 'with new tags' do
+      let(:tags) { ['Beverage', 'Calorie Free'] }
+      let(:create_params) do
+        {
+          name: 'Coke',
+          description: '24oz Bottle',
+          price: '1.98',
+          tags: tags
+        }
+      end
+
+      it 'creates a new Product', :aggregate_failures do
+        expect { post api_v1_products_path, params: params }.to change(Tag, :count).by(2)
+        expect(response).to have_http_status(:created)
+
+        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        expect(product_tags.size).to eq(tags.size)
       end
     end
   end
@@ -101,7 +141,7 @@ describe 'Products', type: :request do
       it 'updates the Product', :aggregate_failures do
         patch api_v1_product_path(product.id), params: params
 
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
 
         updated_product = parse_json(response.body)['data']['attributes'].symbolize_keys
         expect(updated_product).to include(update_params)
@@ -116,7 +156,7 @@ describe 'Products', type: :request do
       it 'returns error', :aggregate_failures do
         patch api_v1_product_path(product.id), params: params
 
-        expect(response).to have_http_status(422)
+        expect(response).to have_http_status(:unprocessable_entity)
 
         error = parse_json(response.body)['errors'].first.symbolize_keys
         expect(error[:detail]).to eq('is not a number')
@@ -133,17 +173,55 @@ describe 'Products', type: :request do
         expect(error[:detail]).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
       end
     end
+
+    context 'with existing tags' do
+      let(:tags) { ['Calorie Free', 'No Sugar'] }
+      let!(:product) { create(:product, tags: [create(:tag, title: 'Beverage')]) }
+      let(:update_params) do
+        { tags: tags }
+      end
+
+      before do
+        tags.each do |title|
+          create(:tag, title: title)
+        end
+      end
+
+      it 'updates the Product', :aggregate_failures do
+        expect { patch api_v1_product_path(product.id), params: params }.not_to change(Tag, :count)
+
+        expect(response).to have_http_status(:ok)
+
+        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        expect(product_tags.size).to eq(tags.size)
+      end
+    end
+
+    context 'with new tags' do
+      let(:tags) { ['Calorie Free', 'No Sugar'] }
+      let!(:product) { create(:product, tags: [create(:tag, title: 'Beverage')]) }
+      let(:update_params) do
+        { tags: tags }
+      end
+
+      it 'updates the Product', :aggregate_failures do
+        expect { patch api_v1_product_path(product.id), params: params }.to change(Tag, :count).by(2)
+
+        expect(response).to have_http_status(:ok)
+
+        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        expect(product_tags.size).to eq(tags.size)
+      end
+    end
   end
 
   describe 'DELETE /api/v1/products/:id' do
     let!(:product) { create(:product) }
 
     it 'destroys product', :aggregate_failures do
-      expect do
-        delete api_v1_product_path(product.id)
-      end.to change(Product, :count).by(-1)
+      expect { delete api_v1_product_path(product.id) }.to change(Product, :count).by(-1)
 
-      expect(response).to have_http_status(204)
+      expect(response).to have_http_status(:ok)
     end
 
     context 'when product does not exist' do
@@ -154,6 +232,18 @@ describe 'Products', type: :request do
 
         error = parse_json(response.body)['errors'].first.symbolize_keys
         expect(error[:detail]).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
+      end
+    end
+
+    context 'when product with tags' do
+      let(:product) { create(:product, tags: [create(:tag, title: 'Beverage'), create(:tag, title: 'Calorie Free')]) }
+
+      it 'destroys product`s tags without tags', :aggregate_failures do
+        expect do
+          delete api_v1_product_path(product.id)
+        end.to change(Product, :count).by(-1).and change(ProductTag, :count).by(-2).and change(Tag, :count).by(0)
+
+        expect(response).to have_http_status(:ok)
       end
     end
   end
