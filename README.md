@@ -1,24 +1,69 @@
-# README
+# Product list app
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A simple Product listing application that allows to:
+* Add new product
+* Edit existing product
+* List all products
+* Tag a product
+* Delete an existing product
 
-Things you may want to cover:
+A product has the following structure:
+* Name
+* Description
+* Price
 
-* Ruby version
+## Requirements
+```
+Ruby v.2.4.10
+Rails v.5.2.0
+```
 
-* System dependencies
+## Installation
+After downloading the project install the dependencies
+```
+bundle install
+```
+Create database
+```
+rake db:create
+```
+Run migrations
+```
+rake db:migrate
+```
+Run project by
+```
+rails s
 
-* Configuration
+```
 
-* Database creation
+## Tests
+To test project run rspec from command line
+```
+rspec
+```
+To run postman tests from command line `node` and `npm` installation is required.
 
-* Database initialization
+Install Newman
+```
+npm install -g newman
+```
+Run Postman tests
+```
+newman run RoR_Interview.postman_collection.json
+```
 
-* How to run the test suite
+## Homework importance and expectations
+- [x] Normalized database, added indexes
+- [x] Validation of models
+- [x] Errors handled
+- [x] Transactional actions included in model methods
+- [x] OOP design patterns: Service object
+- [x] Test coverage
+- [x] Postman tests passed
+- [x] Operations compatible with requirements
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Feature optimizations and improvements
+- [ ] Add pagination
+- [ ] Add Redis cache
+- [ ] Add Taggable Concern

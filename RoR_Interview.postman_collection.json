@@ -1,0 +1,457 @@
+{
+	"info": {
+		"_postman_id": "2ace5942-5c5a-4439-9112-f83dd793a4bd",
+		"name": "Interview Postman tests",
+		"description": "Set of actions prepared for RoR Backend candidates to complete the coding task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Create Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8829cdf2-0274-4f62-9c69-5fe1030ae4c5",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Created Name check\"] = jsonData.data.attributes.name === \"Coke\";",
+									"tests[\"Created Description check\"] = jsonData.data.attributes.description === \"24oz Bottle\";",
+									"tests[\"Created Price check\"] = jsonData.data.attributes.price === \"1.98\";",
+									"tests[\"ID exists check\"] = jsonData.data.id > 0;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"undefined\",\n\t\t\"id\":\"undefined\",\n\t\t\"attributes\":{\n\t\t\t\"name\":\"Coke\",\n\t\t\t\"description\":\"24oz Bottle\",\n\t\t\t\"price\":\"1.98\"\n\t\t}\n\t}\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products Index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6ea3f5a5-4529-47f7-8c14-7ca760be785c",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Existing Title check\"] = jsonData.data[0].attributes.name === \"Coke\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						},
+						"description": "Todos Index"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Second Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "808b0fa8-7453-453a-9036-ee8450b3dd9a",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Created Name check\"] = jsonData.data.attributes.name === \"Pepsi\";",
+									"tests[\"Created Description check\"] = jsonData.data.attributes.description === \"24oz Bottle\";",
+									"tests[\"Created Price check\"] = jsonData.data.attributes.price === \"1.98\";",
+									"tests[\"ID exists check\"] = jsonData.data.id > 0;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"undefined\",\n\t\t\"id\":\"undefined\",\n\t\t\"attributes\":{\n\t\t\t\"name\":\"Pepsi\",\n\t\t\t\"description\":\"24oz Bottle\",\n\t\t\t\"price\":\"1.98\"\n\t\t}\n\t}\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Second Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "54163fcc-2e41-4a64-a04e-e7d7783597ee",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Updated Name check\"] = jsonData.data.attributes.name === \"Pepsi Lemon\";",
+									"tests[\"ID exists check\"] = jsonData.data.id === \"2\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"products\",\n\t\t\"id\":\"2\",\n\t\t\n\t\t\"attributes\":{\n\t\t\t\"name\":\"Pepsi Lemon\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product with Tags (Expect Tags)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5cd228ea-a992-455b-9654-f4861d6d3e4c",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Updated Product check\"] = jsonData.data.attributes.name === \"Coke Diet\";",
+									"tests[\"ID exists check\"] = jsonData.data.id === \"1\";",
+									"tests[\"Added Tags check\"] = jsonData.data.relationships.tags.data[0].id === \"1\";",
+									"tests[\"Added Tags check\"] = jsonData.data.relationships.tags.data[1].id === \"2\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"products\",\n\t\t\"id\":\"1\",\n\t\t\n\t\t\"attributes\":{\n\t\t\t\"name\":\"Coke Diet\",\n\t\t\t\"tags\": [\"Beverage\", \"Calorie Free\"]\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Second Product with Tag (Expect Tags)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a4cc3ebc-96cc-4bfb-9ba4-ff43610294d3",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Updated Product check\"] = jsonData.data.attributes.name === \"Pepsi Zero\";",
+									"tests[\"ID exists check\"] = jsonData.data.id === \"2\";",
+									"tests[\"Added Tags check\"] = jsonData.data.relationships.tags.data[0].id === \"2\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"products\",\n\t\t\"id\":\"2\",\n\t\t\n\t\t\"attributes\":{\n\t\t\t\"name\":\"Pepsi Zero\",\n\t\t\t\"tags\": [\"Calorie Free\"]\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products Index (Expect Tags)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7501b998-8873-4056-b049-e2e425778ced",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Existing Title check\"] = jsonData.data[0].attributes.name === \"Coke Diet\";",
+									"tests[\"Existing Title check\"] = jsonData.data[1].attributes.name === \"Pepsi Zero\";",
+									"tests[\"Added Tags check\"] = jsonData.data[0].relationships.tags.data[0].id === \"1\";",
+									"tests[\"Added Tags check\"] = jsonData.data[0].relationships.tags.data[1].id === \"2\";",
+									"tests[\"Added Tags check\"] = jsonData.data[1].relationships.tags.data[0].id === \"2\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						},
+						"description": "Todos Index"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Tags Index",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7acd7588-aebd-41ef-ac1c-961f69e22042",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Existing Title check\"] = jsonData.data[0].attributes.title === \"Beverage\";",
+									"tests[\"Existing Title check\"] = jsonData.data[1].attributes.title === \"Calorie Free\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/tags",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "405f541f-18fb-4e62-abbc-3f63dca01026",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Created Title check\"] = jsonData.data.attributes.title === \"Draft\";",
+									"tests[\"ID exists check\"] = jsonData.data.id > 0;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"undefined\",\n\t\t\"id\":\"undefined\",\n\t\t\"attributes\":{\n\t\t\t\"title\":\"Draft\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/tags",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "abbed779-a002-4adc-9f0c-0de085a034f2",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"tests[\"Updated Title check\"] = jsonData.data.attributes.title === \"Low Calorie\";",
+									"tests[\"ID exists check\"] = jsonData.data.id  === \"2\";"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"data\":\n\t{\t\"type\":\"tags\",\n\t\t\"id\":\"2\",\n\t\t\n\t\t\"attributes\":{\n\t\t\t\"title\":\"Low Calorie\"\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/tags/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"tags",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
