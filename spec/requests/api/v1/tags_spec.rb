@@ -14,7 +14,7 @@ describe 'Tags', type: :request do
       get api_v1_tags_path
 
       expect(response).to have_http_status(:ok)
-      expect(parse_json(response.body)['data'].size).to eq(number_of_tags)
+      expect(data_count).to eq(number_of_tags)
     end
 
     context 'when no tags' do
@@ -24,7 +24,7 @@ describe 'Tags', type: :request do
         get api_v1_tags_path
 
         expect(response.status).to eq(200)
-        expect(parse_json(response.body)['data'].size).to eq(number_of_tags)
+        expect(data_count).to eq(number_of_tags)
       end
     end
   end
@@ -48,9 +48,7 @@ describe 'Tags', type: :request do
         expect { post api_v1_tags_path, params: params }.to change(Tag, :count).by(1)
 
         expect(response).to have_http_status(:created)
-
-        new_tag = parse_json(response.body)['data']['attributes'].symbolize_keys
-        expect(new_tag).to include(create_params)
+        expect(attributes).to include(create_params)
       end
     end
 
@@ -67,9 +65,7 @@ describe 'Tags', type: :request do
         expect { post api_v1_tags_path, params: params }.not_to change(Tag, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq('has already been taken')
+        expect(errors.dig(0, :detail)).to eq('has already been taken')
       end
     end
   end
@@ -94,9 +90,7 @@ describe 'Tags', type: :request do
         patch api_v1_tag_path(tag.id), params: params
 
         expect(response).to have_http_status(:ok)
-
-        updated_tag = parse_json(response.body)['data']['attributes'].symbolize_keys
-        expect(updated_tag).to include(update_params)
+        expect(attributes).to include(update_params)
       end
     end
 
@@ -109,9 +103,7 @@ describe 'Tags', type: :request do
         patch api_v1_tag_path(tag.id), params: params
 
         expect(response).to have_http_status(:unprocessable_entity)
-
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq("can't be blank")
+        expect(errors.dig(0, :detail)).to eq("can't be blank")
       end
     end
 
@@ -121,8 +113,7 @@ describe 'Tags', type: :request do
       it 'returns error', :aggregate_failures do
         patch api_v1_tag_path(non_existing_tag_id), params: params
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq("Couldn't find Tag with 'id'=#{non_existing_tag_id}")
+        expect(errors.dig(0, :detail)).to eq("Couldn't find Tag with 'id'=#{non_existing_tag_id}")
       end
     end
   end
@@ -142,8 +133,7 @@ describe 'Tags', type: :request do
       it 'returns error', :aggregate_failures do
         delete api_v1_tag_path(non_existing_tag_id)
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq("Couldn't find Tag with 'id'=#{non_existing_tag_id}")
+        expect(errors.dig(0, :detail)).to eq("Couldn't find Tag with 'id'=#{non_existing_tag_id}")
       end
     end
 
@@ -155,8 +145,7 @@ describe 'Tags', type: :request do
       it 'returns error', :aggregate_failures do
         delete api_v1_tag_path(tag.id)
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq('Cannot delete record because dependent product tags exist')
+        expect(errors.dig(0, :detail)).to eq('Cannot delete record because dependent product tags exist')
       end
     end
   end

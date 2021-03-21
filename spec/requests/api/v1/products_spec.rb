@@ -14,7 +14,7 @@ describe 'Products', type: :request do
       get api_v1_products_path
 
       expect(response).to have_http_status(:ok)
-      expect(parse_json(response.body)['data'].size).to eq(number_of_products)
+      expect(data_count).to eq(number_of_products)
     end
 
     context 'when no products' do
@@ -23,8 +23,8 @@ describe 'Products', type: :request do
       it 'returns a success response', :aggregate_failures do
         get api_v1_products_path
 
-        expect(response.status).to eq(200)
-        expect(parse_json(response.body)['data'].size).to eq(number_of_products)
+        expect(response).to have_http_status(:ok)
+        expect(data_count).to eq(number_of_products)
       end
     end
   end
@@ -52,8 +52,7 @@ describe 'Products', type: :request do
         expect { post api_v1_products_path, params: params }.to change(Product, :count).by(1)
         expect(response).to have_http_status(:created)
 
-        new_product = parse_json(response.body)['data']['attributes'].symbolize_keys
-        expect(new_product).to include(create_params)
+        expect(attributes).to include(create_params)
       end
     end
 
@@ -70,8 +69,7 @@ describe 'Products', type: :request do
         expect { post api_v1_products_path, params: params }.not_to change(Product, :count)
         expect(response).to have_http_status(:unprocessable_entity)
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq('is not a number')
+        expect(errors.dig(0, :detail)).to eq('is not a number')
       end
     end
 
@@ -96,7 +94,7 @@ describe 'Products', type: :request do
         expect { post api_v1_products_path, params: params }.not_to change(Tag, :count)
         expect(response).to have_http_status(:created)
 
-        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        product_tags = relationships_data('tags')
         expect(product_tags.size).to eq(tags.size)
       end
     end
@@ -116,7 +114,7 @@ describe 'Products', type: :request do
         expect { post api_v1_products_path, params: params }.to change(Tag, :count).by(2)
         expect(response).to have_http_status(:created)
 
-        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        product_tags = relationships_data('tags')
         expect(product_tags.size).to eq(tags.size)
       end
     end
@@ -142,9 +140,7 @@ describe 'Products', type: :request do
         patch api_v1_product_path(product.id), params: params
 
         expect(response).to have_http_status(:ok)
-
-        updated_product = parse_json(response.body)['data']['attributes'].symbolize_keys
-        expect(updated_product).to include(update_params)
+        expect(attributes).to include(update_params)
       end
     end
 
@@ -157,9 +153,7 @@ describe 'Products', type: :request do
         patch api_v1_product_path(product.id), params: params
 
         expect(response).to have_http_status(:unprocessable_entity)
-
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq('is not a number')
+        expect(errors.dig(0, :detail)).to eq('is not a number')
       end
     end
 
@@ -169,8 +163,7 @@ describe 'Products', type: :request do
       it 'returns error', :aggregate_failures do
         patch api_v1_product_path(non_existing_product_id), params: params
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
+        expect(errors.dig(0, :detail)).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
       end
     end
 
@@ -192,7 +185,7 @@ describe 'Products', type: :request do
 
         expect(response).to have_http_status(:ok)
 
-        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        product_tags = relationships_data('tags')
         expect(product_tags.size).to eq(tags.size)
       end
     end
@@ -209,7 +202,7 @@ describe 'Products', type: :request do
 
         expect(response).to have_http_status(:ok)
 
-        product_tags = parse_json(response.body).dig('data', 'relationships', 'tags', 'data')
+        product_tags = relationships_data('tags')
         expect(product_tags.size).to eq(tags.size)
       end
     end
@@ -230,8 +223,7 @@ describe 'Products', type: :request do
       it 'returns error', :aggregate_failures do
         delete api_v1_product_path(non_existing_product_id)
 
-        error = parse_json(response.body)['errors'].first.symbolize_keys
-        expect(error[:detail]).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
+        expect(errors.dig(0, :detail)).to eq("Couldn't find Product with 'id'=#{non_existing_product_id}")
       end
     end
 
